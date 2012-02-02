@@ -1,0 +1,196 @@
+// -*- Mode: C++; c-basic-offset: 4  -*-
+/* $Id: value.hg,v 1.3 2004/12/12 22:04:01 murrayc Exp $ */
+
+/* value.hg
+ * 
+ * Copyright (C) 2000-2002 MateConfmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/ustring.h>
+#include <mateconfmm/value_listhelpers.h>
+
+_DEFS(mateconfmm,mateconf)
+
+namespace Mate
+{
+
+namespace Conf
+{
+
+_WRAP_ENUM(ValueType,MateConfValueType)
+_WRAP_ENUM(UnsetFlags, MateConfUnsetFlags)
+
+typedef std::pair<Value, Value> ValuePair;    
+typedef std::pair<ValueType, ValueType> ValueTypePair;
+
+/** Wrapper for primitive types.
+ * This class wraps the primitive types that are passed to 
+ * and from instances of Mate::Conf::Client. It has an associated 
+ * @c ValueType, which is specified at creation time, 
+ * but can be changed with assignment. If the type is @c VALUE_INVALID then the effect
+ * of the set and get methods is undefined. Using a default-constructed
+ * Value without using any of the set methods produces undefined
+ * behaviour.
+ *
+ * Compound Values of type VALUE_PAIR and VALUE_LIST can only have 
+ * elements whose types are neither VALUE_PAIR or VALUE_LIST - they can only have primitive types.
+ *
+ * The Value class has copy-by-value semantics - all arguments to the
+ * set methods are copied.
+ * 
+ * Note that while the type is named VALUE_FLOAT, the accessors for 
+ * floating-point values use @c double, not @c float, to preserve 
+ * accuracy.
+ */
+class Value 
+{
+  _CLASS_OPAQUE_COPYABLE(Value,MateConfValue,NONE,mateconf_value_copy,mateconf_value_free)
+  _CUSTOM_DEFAULT_CTOR
+  _IGNORE(mateconf_value_free, mateconf_value_copy, mateconf_value_compare)
+public:
+
+  /** Create a Value.
+   * You should call a set() method before using the Value.
+   * @param type: The type of the produced value.
+   */
+  Value(ValueType type = VALUE_INVALID);
+
+  /** Set the integer value of a Value whose type is VALUE_INT
+   */
+  _WRAP_METHOD(void set(gint val), mateconf_value_set_int)
+
+  /** Set the float value of a Value whose type is VALUE_FLOAT
+   * @param val: the @c double this Value will be se to.
+   */
+  _WRAP_METHOD(void set(gdouble val), mateconf_value_set_float)
+
+  /** Set the boolean value of a Value whose type is VALUE_BOOL */
+  _WRAP_METHOD(void set(bool val), mateconf_value_set_bool)
+
+  /** Set the Schema of a Value whose type is VALUE_SCHEMA */
+  _WRAP_METHOD(void set(const Schema& sc), mateconf_value_set_schema)
+
+  /** Set the car (in a pair, the first element) of a Value whose type is VALUE_PAIR */
+  _WRAP_METHOD(void set_car(const Value& car), mateconf_value_set_car)
+
+  /** Set the cdr (in a pair, the second element) of a Value whose type is VALUE_PAIR */
+  _WRAP_METHOD(void set_cdr(const Value& cdr), mateconf_value_set_cdr)
+
+  /** Set the string of a Value whose type is VALUE_STRING */
+  _WRAP_METHOD(void set(const Glib::ustring& val), mateconf_value_set_string)
+  _IGNORE(mateconf_value_set_car_nocopy, mateconf_value_set_cdr_nocopy, mateconf_value_set_schema_nocopy)
+
+  /** Sets the type of the elements of a Value with type VALUE_LIST */
+  _WRAP_METHOD(void set_list_type(ValueType type), mateconf_value_set_list_type)
+
+  /** Sets the Value to contain a list of integers.
+   * set_list_type(VALUE_INT) must have been called prior this call.
+   * @param list: an STL-compatible container whose value_type is @c int
+   */
+  _WRAP_METHOD(void set_int_list(const SListHandle_ValueInt& list), mateconf_value_set_list_nocopy)
+
+  /** Sets the Value to contain a list of bools.
+   * @see set_int_list */
+  _WRAP_METHOD(void set_bool_list(const SListHandle_ValueBool& list), mateconf_value_set_list_nocopy)
+
+  /** Sets the Value to contain a list of doubles.
+   * @see set_int_list */
+  _WRAP_METHOD(void set_float_list(const SListHandle_ValueFloat& list), mateconf_value_set_list_nocopy)
+
+  /** Sets the Value to contain a list of strings.
+   * @see set_int_list */
+  _WRAP_METHOD(void set_string_list(const SListHandle_ValueString& list), mateconf_value_set_list_nocopy)
+
+  /** Sets the Value to contain a list of Schema.
+   * @see set_int_list */
+  _WRAP_METHOD(void set_schema_list(const SListHandle_ValueSchema& list), mateconf_value_set_list_nocopy)
+  _IGNORE(mateconf_value_set_list)
+
+  /** Get the type of the Value.
+   * @return the type of the Value
+   */
+  ValueType get_type() const;
+  _IGNORE(mateconf_value_get_type)
+
+  /** Get the type of the list elements of the Value.
+   * Do not call this method on non-list Values.
+   * @return the type of the list elements.
+   */
+  _WRAP_METHOD(ValueType get_list_type() const, mateconf_value_get_list_type)
+
+  /** Get the integer that the Value contains */
+  _WRAP_METHOD(int get_int() const, mateconf_value_get_int)
+
+  /** Get the boolean that the Value contains */
+  _WRAP_METHOD(bool get_bool() const, mateconf_value_get_bool)
+
+  /** Get the double that the Value contains */
+  _WRAP_METHOD(double get_float() const, mateconf_value_get_float)
+
+  /** Get the string that the Value contains */
+  _WRAP_METHOD(Glib::ustring get_string() const, mateconf_value_get_string)
+  _IGNORE(mateconf_value_get_schema)
+
+  /** Get a copy of the Schema of the value.. */
+  Schema get_schema() const;
+  _IGNORE(mateconf_value_get_car, mateconf_value_get_cdr)
+
+  /** Get a copy of the car of a VALUE_PAIR Value */
+  Value get_car() const;
+
+  /** Get a copy of the cdr of a VALUE_PAIR Value */
+  Value get_cdr() const;
+
+  /** Gets a list of doubles from the Value.
+   * Typical usage is
+   * @code
+   * std::vector<double> foo = value.get_float_list();
+   * @endcode.
+   * @return: an STL-compatible container with doubles as its value type.
+   * Assign to an std::vector, list or deque for proper use.
+   */
+  _WRAP_METHOD(SListHandle_ValueFloat  get_float_list() const, mateconf_value_get_list)
+
+  /** Retrieves the list of integers from the Value.
+   * @see get_float_list
+   */
+  _WRAP_METHOD(SListHandle_ValueInt    get_int_list() const, mateconf_value_get_list)
+
+  /** Retrieves the list of booleans from the Value.
+   * @see get_float_list
+   */
+  _WRAP_METHOD(SListHandle_ValueBool   get_bool_list() const, mateconf_value_get_list)
+
+  /** Retrieves the list of strings from the Value.
+   * @see get_float_list
+   */
+  _WRAP_METHOD(SListHandle_ValueString get_string_list() const, mateconf_value_get_list)
+
+  /** Retrieves the list of Schemas from the Value.
+   * @See get_float_list
+   */
+  _WRAP_METHOD(SListHandle_ValueSchema get_schema_list() const, mateconf_value_get_list)
+
+  /** Convert the Value to a string.
+   * The string is not machine-parseable. Do not depend on the
+   * format of the string.
+   */
+  _WRAP_METHOD(Glib::ustring to_string() const, mateconf_value_to_string)
+};
+
+} /* namespace Conf */
+} /* namespace Mate */

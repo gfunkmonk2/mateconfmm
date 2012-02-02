@@ -1,0 +1,6 @@
+Base directory for MateConfmm - the C++ wrapper for MateConf
+
+Here is the layout
+
+  src - sources used to generate wrappers
+  mateconfmm - built and manually written sources

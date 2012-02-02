@@ -1,0 +1,29 @@
+;; From MateConfClient
+
+(define-signal value-changed
+  (of-object "MateConfClient")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("const-gchar*" "p0")
+    '("MateConfValue*" "p1")
+  )
+)
+
+(define-signal unreturned-error
+  (of-object "MateConfClient")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GError*" "p0")
+  )
+)
+
+(define-signal error
+  (of-object "MateConfClient")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GError*" "p0")
+  )
+)

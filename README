@@ -1,0 +1,3 @@
+mateconfmm
+
+C++ wrappers for MateConf. All classes are in the Mate::Conf namespace.

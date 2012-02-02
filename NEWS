@@ -1,0 +1,126 @@
+2.28.0:
+
+* Fixed the build with the latest gmmproc.
+  (Murray Cumming)
+
+2.26.0:
+
+* Cleaned up glib includes to use only toplevel headers.
+  (Przemysław Grzegorczyk) Bug #564214
+	
+2.24.0:
+
+* Updated version to match mate 2.24.
+
+2.23.1:
+
+* Client:
+  - Added recursive_unset(). (Josephine Hsu, Motorola)
+    Bug #549158.
+  - Added notify(). (Murray Cumming, Openismus)
+
+2.22.0:
+
+* Fixed Windows build.
+  (Armin Burgmeier)
+
+2.20.0:
+
+Increased version to match the MATE version
+
+2.18.1:
+
+* SetInterface.h: Use #pragma GCC system_header
+  to supress warnings about the lack of a virtual destructor.
+  (Martin Ejdestig, Bug #460969)
+* Build: Check for both m4 and M4 in the GNU m4 output,
+  to fix the build on some platforms.
+  (Yselkowitz , Bug #423990)
+
+2.18.0:
+
+Increased version to match the MATE version.
+
+2.16.0:
+
+Increased version to match the MATE version.
+
+2.14.2:
+
+* Fix the regular build.
+  (Jonathon Jongsma, Elijah Newren)
+
+2.14.1:
+
+* Fixed build when using --enable-api-exceptions=no with glibmm.
+  (Murray Cumming)
+
+2.14.0:
+
+* Increased version number for MATE 2.14.
+
+2.12.0:
+
+mateconfmm 2.12 is API/ABI-compatible with mateconfmm 2.10.x, 2.8.x, and 2.6.x.
+
+* 64-bit build fixes. (Bradley Bell, Stanislav Brabec)
+
+2.10.0:
+
+mateconfmm 2.10 is API/ABI-compatible with mateconfmm 2.8.x and mateconfmm 2.6.x.
+
+Changes compared to mateconfmm 2.8:
+* Client: Added set_*_list() methods. 
+  (Bryan Forbes, Murray Cumming)
+
+
+2.9.2:
+
+* Client: Rename set(list) methods to set_*_list() methods,
+  to resolve ambiguity.
+  However, the int, float, and bool ones don't work yet.
+  (Bryan Forbes, Murray Cumming)
+
+2.9.1:
+
+* Client: added set() methods for lists.
+  (Bryan Forbes)
+
+2.8.1:
+
+* Remove extra ;s for g++ 3.4.
+
+2.8.0:
+
+* Increased version for MATE 2.8 release version.
+
+2.6.1:
+
+* Client::signal_value_changed(): Corrected refcount problem
+  that caused a crash. (Daniel Elstner)
+
+2.6.0:
+
+* API/ABI-Stable release.
+
+2.5.1:
+
+* Updated for the latest libsigc++2 API.
+
+2.5.0:
+ 
+This is the new unstable branch of the parallel-installable mateconfmm 2.6,
+for use with gtkmm 2.4.
+
+2.0.1:
+
+* Prevent double-destruction segfault in Entry (Oe Laursen)
+
+2.0.0:
+
+* Client: Added get_entry() overload, using default locale.
+  (Andreas Holzmann)
+* Client, ChangeSet, Schema: get_*() methods are now const.
+  (Andreas Holzmann)
+* Schema, Entry: Removed obsolete constructors.
+  (Bassoukos Anastasios)

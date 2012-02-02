@@ -1,0 +1,12 @@
+#ifndef _MATECONFMM_CONFIG_H
+#define _MATECONFMM_CONFIG_H 1
+
+#include "gtkmmconfig.h"
+
+/* version numbers */
+#undef MATECONFMM_MAJOR_VERSION
+#undef MATECONFMM_MINOR_VERSION
+#undef MATECONFMM_MICRO_VERSION
+#undef MATECONFMM_VERSION
+
+#endif /* _MATECONFMM_CONFIG_H */

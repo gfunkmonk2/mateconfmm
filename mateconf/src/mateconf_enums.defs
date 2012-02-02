@@ -1,0 +1,99 @@
+;; From /mate/head/cvs/mateconf/mateconf/mateconf-client.h
+
+(define-enum-extended ConfClientPreloadType
+  (in-module "G")
+  (c-name "MateConfClientPreloadType")
+  (values
+    '("none" "MATECONF_CLIENT_PRELOAD_NONE" "0")
+    '("onelevel" "MATECONF_CLIENT_PRELOAD_ONELEVEL" "1")
+    '("recursive" "MATECONF_CLIENT_PRELOAD_RECURSIVE" "2")
+  )
+)
+
+(define-enum-extended ConfClientErrorHandlingMode
+  (in-module "G")
+  (c-name "MateConfClientErrorHandlingMode")
+  (values
+    '("none" "MATECONF_CLIENT_HANDLE_NONE" "0")
+    '("unreturned" "MATECONF_CLIENT_HANDLE_UNRETURNED" "1")
+    '("all" "MATECONF_CLIENT_HANDLE_ALL" "2")
+  )
+)
+
+;; From /mate/head/cvs/mateconf/mateconf/mateconf-error.h
+
+(define-enum-extended ConfError
+  (in-module "G")
+  (c-name "MateConfError")
+  (values
+    '("success" "MATECONF_ERROR_SUCCESS" "0")
+    '("no-server" "MATECONF_ERROR_NO_SERVER" "2")
+    '("no-permission" "MATECONF_ERROR_NO_PERMISSION" "3")
+    '("bad-address" "MATECONF_ERROR_BAD_ADDRESS" "4")
+    '("parse-error" "MATECONF_ERROR_PARSE_ERROR" "6")
+    '("corrupt" "MATECONF_ERROR_CORRUPT" "7")
+    '("type-mismatch" "MATECONF_ERROR_TYPE_MISMATCH" "8")
+    '("is-dir" "MATECONF_ERROR_IS_DIR" "9")
+    '("is-key" "MATECONF_ERROR_IS_KEY" "10")
+    '("overridden" "MATECONF_ERROR_OVERRIDDEN" "11")
+    '("oaf-error" "MATECONF_ERROR_OAF_ERROR" "12")
+    '("local-engine" "MATECONF_ERROR_LOCAL_ENGINE" "13")
+    '("lock-failed" "MATECONF_ERROR_LOCK_FAILED" "14")
+    '("no-writable-database" "MATECONF_ERROR_NO_WRITABLE_DATABASE" "15")
+    '("in-shutdown" "MATECONF_ERROR_IN_SHUTDOWN" "16")
+  )
+)
+
+;; From /mate/head/cvs/mateconf/mateconf/mateconf-internals.h
+
+(define-enum-extended ConfLogPriority
+  (in-module "G")
+  (c-name "MateConfLogPriority")
+  (values
+    '("emerg" "GCL_EMERG" "0")
+    '("alert" "GCL_ALERT" "1")
+    '("crit" "GCL_CRIT" "2")
+    '("err" "GCL_ERR" "3")
+    '("warning" "GCL_WARNING" "4")
+    '("notice" "GCL_NOTICE" "5")
+    '("info" "GCL_INFO" "6")
+    '("debug" "GCL_DEBUG" "7")
+  )
+)
+
+;; From /mate/head/cvs/mateconf/mateconf/mateconf-sources.h
+
+(define-enum-extended ConfUnsetFlags
+  (in-module "G")
+  (c-name "MateConfUnsetFlags")
+  (values
+    '("s" "MATECONF_UNSET_INCLUDING_SCHEMA_NAMES" "0")
+  )
+)
+
+(define-flags-extended ConfSourceFlags
+  (in-module "G")
+  (c-name "MateConfSourceFlags")
+  (values
+    '("all-writeable" "MATECONF_SOURCE_ALL_WRITEABLE" "1 << 0")
+    '("all-readable" "MATECONF_SOURCE_ALL_READABLE" "1 << 1")
+    '("never-writeable" "MATECONF_SOURCE_NEVER_WRITEABLE" "1 << 2")
+  )
+)
+
+;; From /mate/head/cvs/mateconf/mateconf/mateconf-value.h
+
+(define-enum-extended ConfValueType
+  (in-module "G")
+  (c-name "MateConfValueType")
+  (values
+    '("invalid" "MATECONF_VALUE_INVALID" "0")
+    '("string" "MATECONF_VALUE_STRING" "1")
+    '("int" "MATECONF_VALUE_INT" "2")
+    '("float" "MATECONF_VALUE_FLOAT" "3")
+    '("bool" "MATECONF_VALUE_BOOL" "4")
+    '("schema" "MATECONF_VALUE_SCHEMA" "5")
+    '("list" "MATECONF_VALUE_LIST" "6")
+    '("pair" "MATECONF_VALUE_PAIR" "7")
+  )
+)

@@ -1,0 +1,493 @@
+// -*- Mode: C++; c-basic-offset: 4 -*-
+/* $Id: client.hg,v 1.25 2005/03/03 13:17:47 murrayc Exp $ */
+
+/* client.hg
+ * 
+ * Copyright (C) 2000-2002 MateConfmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <mateconf/mateconf-client.h>
+
+#include <glibmm/object.h>
+
+#include <glibmm/error.h>
+#include <mateconfmm/value.h>
+#include <mateconfmm/callback.h>
+#include <mateconfmm/entry.h>
+#include <mateconfmm/schema.h>
+#include <mateconfmm/setinterface.h>
+#include <mateconfmm/changeset.h>
+
+_DEFS(mateconfmm,mateconf)
+
+namespace Mate
+{
+namespace Conf
+{
+
+_WRAP_ENUM(ClientErrorHandlingMode, MateConfClientErrorHandlingMode)
+_WRAP_ENUM(ClientPreloadType, MateConfClientPreloadType)
+
+#m4 include(gerror.m4)
+
+/** Exception class for Mate::Conf::Client errors.
+ */
+_WRAP_GERROR(Error,MateConfError,MATECONF_ERROR)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+template <typename T>
+struct BasicTypeTraits 
+{
+  typedef T CppType;
+  typedef CppType* CType;
+  typedef CppType* CTypeNonConst;
+
+  static CType to_c_type(CppType val)
+  {
+    CType pVal = new CppType;
+    *pVal = val;
+    return pVal;
+  }
+
+  static CType to_c_type(CType ptr)
+  { return ptr; } 
+  
+  static CppType to_cpp_type(CType ptr)
+  {
+    if(ptr)
+    {
+      return *ptr;
+    }
+    else
+      return CppType();
+  }
+  
+  static void release_c_type(CType ptr)
+  {
+    if(ptr)
+      delete ptr;
+  }
+};
+
+
+//Template specialization:
+template <>
+struct BasicTypeTraits<int> 
+{
+  typedef int CppType;
+  typedef CppType* CType;
+  typedef CppType* CTypeNonConst;
+
+  static CType to_c_type(CppType val)
+  { return (int*)GINT_TO_POINTER(val); }
+
+  static CType to_c_type(CType ptr)
+  { return ptr; } 
+  
+  static CppType to_cpp_type(CType ptr)
+  {
+    if(ptr)
+    {
+      return GPOINTER_TO_INT(ptr);
+    }
+    else
+      return CppType();
+  }
+  
+  static void release_c_type(CType /* ptr */)
+  {
+  }
+};
+
+template <>
+struct BasicTypeTraits<bool> 
+{
+  typedef bool CppType;
+  typedef gboolean* CType;
+  typedef gboolean* CTypeNonConst;
+
+  static CType to_c_type(CppType val)
+  {
+    return (int*)GINT_TO_POINTER(val);
+  }
+
+  static CType to_c_type(CType ptr)
+  { return ptr; } 
+  
+  static CppType to_cpp_type(CType ptr)
+  {
+    if(ptr)
+    {
+      //We use this for gboolean too, because it is actually an int.
+      return GPOINTER_TO_INT(ptr);
+    }
+    else
+      return CppType();
+  }
+  
+  static void release_c_type(CType /* ptr */)
+  {
+
+  }
+};
+
+#endif //DOXYGEN_SHOULD_SKIP_THIS
+
+
+/** The main Mate::Conf object.
+ * This class allows you to interface withe the Mate configuration system.
+ * Generally, it stores key-value pairs. The keys have an hierarchical
+ * namespace, with elements separated by slashes. The values are either
+ * typed primitives (int, bool, string, float or a @c Schema), or lists of
+ * primitives or pairs of primitives (for limits on the compound values,
+ * see Value). For conventions on the names of keys, see the MateConf
+ * documentation.
+ */
+class Client : public Glib::Object, public SetInterface
+{
+    _CLASS_GOBJECT(Client, MateConfClient, MATECONF_CLIENT, Glib::Object, GObject)
+    
+public:
+    
+    /** Get the default client object for this application.
+     * The object is a Singleton, so you will always get the same instance.
+     * Most applications should use this. */
+    static Glib::RefPtr<Client> get_default_client();
+    static Glib::RefPtr<Client> get_client_for_engine(MateConfEngine* engine);
+    
+    /** Add a directory to the list of directories the Client will watch.
+     * Any changes to keys below this directory will cause the "value_changed" signal
+     * to be emitted. When you add the directory, you can request that the Client
+     * preloads its contents - see ClientPreloadType for details.
+     * 
+     * Added directories may not overlap. That is, if you add "/foo", you may not
+     * add "/foo/bar". However you can add "/foo" and "/bar". You can also add "/foo" 
+     * multiple times; if you add a directory multiple times, it will not be removed 
+     * until you call remove_dir() an equal number of times.
+     * @param dir: the directory to watch.
+     * @param preload: the preload type (if any) to be performed.
+     */
+    _WRAP_METHOD(void add_dir(const Glib::ustring& dir, ClientPreloadType preload = CLIENT_PRELOAD_NONE), mateconf_client_add_dir, errthrow)
+
+    /** Remove a directory from the list of directories the Client will watch.
+     * @see add_dir() */
+    _WRAP_METHOD(void remove_dir(const Glib::ustring& dir), mateconf_client_remove_dir, errthrow)
+
+    // API-TODO: Should this return a Connection ?
+    /** Request notification of changes to namespace_section. 
+     * This includes the key @p namespace_section itself, and any keys below it.
+     * For the notification to happen, @p namespace_section must be equal to or
+     * below one of the directories added with add_dir(). 
+     * You can still call notify_add() for other directories, 
+     * but no notification will be received until you add a directory above 
+     * or equal to @p namespace_section. One implication of this is that remove_dir() 
+     * temporarily disables notifications that were below the removed directory.
+     * 
+     * The callback will be called with the key that changed and the Entry that
+     * holds the new Value. If the Value has a type of VALUE_INVALID, then the key has been unset.
+     *
+     * The function returns a connection ID you can use when calling notify_remove().
+     *
+     * @param namespace_section: the namespace section for which notification is required.
+     * @param callback: the sigc::slot to call when the a key under namespace_section changes.
+     * @return a connection id that can be passed to notify_remove() to cancel the notification request.
+     */
+    guint notify_add(const Glib::ustring& namespace_section, Callback callback);
+    _IGNORE(mateconf_client_notify_add)
+    
+    /** Cancel a notification request.
+     * @param cnxn: a connection id, previously returned by notify_add()
+     * @see notify_add()
+     */
+    _WRAP_METHOD(void notify_remove(guint cnxn), mateconf_client_notify_remove, errthrow)
+
+    /** Emits the value_changed signal and notifies listeners as if @a key had been changed.
+     * @param key The key that has changed.
+     *
+     * @newin2p24
+     */ 
+    _WRAP_METHOD(void notify(const Glib::ustring& key), mateconf_client_notify)
+    
+    _WRAP_METHOD(void set_error_handling(ClientErrorHandlingMode mode), mateconf_client_set_error_handling)
+    
+    /** Clear the client-side cache */
+    _WRAP_METHOD(void clear_cache(), mateconf_client_clear_cache)
+    
+    /** Preloads a directory.
+     * Normally this happens automatically with add_dir(), but if you've called clear_cache()
+     * you may need to do it again.
+     * @see add_dir()
+     */
+    _WRAP_METHOD(void preload(const Glib::ustring& dirname, ClientPreloadType type), mateconf_client_preload, errthrow)
+    
+    /** Get the value of a configuration key.
+     * @parameter key: the configuration key to retrieve.
+     * @return the Value of the key.
+     * @throw Mate::Conf::Error.
+     */
+    _WRAP_METHOD(Value get(const Glib::ustring& key) const, mateconf_client_get, errthrow)
+
+    /** Get the value of a configuration key, without falling back to the default if
+     * the key has not been set. In that case, the type of the value will be 
+     * VALUE_INVALID.
+     * @param key: the configuration key to retrieve.
+     * @return the Value of the key.
+     * @throw Mate::Conf::Error.
+     */
+    _WRAP_METHOD(Value get_without_default(const Glib::ustring& key) const, mateconf_client_get_without_default, errthrow)
+
+    /** Get the default value of this key by looking it up in the appropriate schema.
+     * @parameter key: the configuration key to retrieve.
+     * @return the default Value of the key.
+     * @throw Mate::Conf::Error.
+     */
+    _WRAP_METHOD(Value get_default_from_schema(const Glib::ustring& key) const, mateconf_client_get_default_from_schema, errthrow)
+
+     /** Get the complete Entry of the specified key.
+     * Uses the default locale
+     * @param key the configuration key to retrieve.
+     * @param use_schema_default whether to fall back to the Schema default value if the specified configuration key
+     * has not been set.
+     * @return an Entry for the corresponding configuration key.
+     * @throw Mate::Conf::Error.
+     */
+    Entry get_entry(const Glib::ustring& key, bool use_schema_default = true) const;
+      
+    /** Get the complete Entry of the specified key.
+     * @param key the configuration key to retrieve.
+     * @param locale the locale for the user-visible strings in the Entry's Schema. Use 0 to use the default.
+     * @param use_schema_default whether to fall back to the Schema default value if the specified configuration key 
+     * has not been set.
+     * @return an Entry for the corresponding configuration key.
+     * @throw Mate::Conf::Error.
+     */
+    _WRAP_METHOD(Entry get_entry(const Glib::ustring& key, const char* locale, bool use_schema_default = true) const, mateconf_client_get_entry, errthrow)
+    
+    /** Unset a configuration key.
+     * @param key the configuration key to unset.
+     * @throw Mate::Conf::Error.
+     */
+    _WRAP_METHOD(void unset(const Glib::ustring& key), mateconf_client_unset, errthrow)
+
+    /** Unsets all keys below @a key, including @a key itself.
+     * If any unset fails, it continues on to unset as much as it can. The first failure is then thrown as an exception.
+     * @param key The configuration key to unset.
+     * @param flags Change how the unset is done.
+     * @throw Mate::Conf::Error.
+     *
+     * @newin2p24
+     */
+    _WRAP_METHOD(void recursive_unset(const Glib::ustring& key, UnsetFlags flags = UNSET_INCLUDING_SCHEMA_NAMES), mateconf_client_recursive_unset, errthrow)
+    
+    /** Retrieve all keys in the given configuration directory.
+     * Get all the configuration keys in the given directory, without recursion.
+     * @param dir: the configuration directory to scan.
+     * @return a container with the names of the configuration keys.
+     * @throw Mate::Conf::Error.
+     */
+    _WRAP_METHOD(Glib::SListHandle<Entry> all_entries(const Glib::ustring& dir) const, mateconf_client_all_entries, errthrow)
+
+    /** Retrieve all subdirectories of a given configuration directory.
+     * @param dir: the configuration directory to scan.
+     * @return a container with the names of the subdirectories.
+     * @throw Mate::Conf::Error.
+     */
+    _WRAP_METHOD(Glib::SListHandle<Glib::ustring> all_dirs(const Glib::ustring& dir) const, mateconf_client_all_dirs, errthrow)
+    
+    /** Suggest to the MateConf server that a sync of cached data to 
+     * stable storage would be appropriate now. 
+     * @throw Mate::Conf::Error.
+    */
+    _WRAP_METHOD(void suggest_sync(), mateconf_client_suggest_sync, errthrow)
+
+    /** Determine whether a given configuration directory exists.
+     * @return true if the directory exists.
+     * @throw Mate::Conf::Error.
+     */
+    _WRAP_METHOD(bool dir_exists(const Glib::ustring&) const, mateconf_client_dir_exists, errthrow)
+
+    /** Determine whether a given configuration key is writeable by the application.
+     * @return true if the key is writeable.
+     * @throw Mate::Conf::Error.
+     */
+    _WRAP_METHOD(bool key_is_writable(const Glib::ustring&) const, mateconf_client_key_is_writable, errthrow)
+    
+    /** Get the float value at the given configuration key.
+     * Throws an error if the key does not contain the appropriate type.
+     * @param key: the configuration key to fetch.
+     * @return the value at the specified configuration key.
+     * @throw Mate::Conf::Error
+     */
+    _WRAP_METHOD(double get_float(const Glib::ustring& key) const, mateconf_client_get_float, errthrow)
+
+    /** Get the integer at the given configuration key.
+     * @copydoc Client::get_float(const Glib::ustring&) */
+    _WRAP_METHOD(gint get_int(const Glib::ustring& key) const, mateconf_client_get_int, errthrow)
+
+    /** Get the boolean at the given configuration key.
+     * @copydoc Client::get_float(const Glib::ustring&) */
+    _WRAP_METHOD(bool get_bool(const Glib::ustring& key) const, mateconf_client_get_bool, errthrow)
+
+    /** Get the string at the given configuration key.
+     * @copydoc Client::get_float(const Glib::ustring&) */
+    _WRAP_METHOD(Glib::ustring get_string(const Glib::ustring& key) const, mateconf_client_get_string, errthrow)
+
+    /** Get the Schema at the given configuration key.
+     * @copydoc Client::get_float(const Glib::ustring&) */
+    _WRAP_METHOD(Schema get_schema(const Glib::ustring& key) const, mateconf_client_get_schema, errthrow)
+
+    /** Get the list of integers at the given configuration key.
+     * If the given key is not a list, or the list elements are not of the appropriate type,
+     * an error will be thrown.
+     * @param key the configuration key that contains the list.
+     * @return a Glib::SListHandle of the appropriate type.
+     * @throw Mate::Conf::Error
+     */
+    SListHandle_ValueInt    get_int_list(const Glib::ustring& key) const;
+
+    /** Get the list of booleans at the given configuration key.
+     * @copydoc Client::get_int_list(const Glib::ustring&) */
+    SListHandle_ValueBool   get_bool_list(const Glib::ustring& key) const;
+
+    /** Get the list of doubles at the given configuration key.
+     * @copydoc Client::get_int_list(const Glib::ustring&) */
+    SListHandle_ValueFloat  get_float_list(const Glib::ustring& key) const;
+
+    /** Get the list of Schemas at the given configuration key.
+     * @copydoc Client::get_int_list(const Glib::ustring&) */
+    SListHandle_ValueSchema get_schema_list(const Glib::ustring& key) const;
+
+    /** Get the list of strings at the given configuration key.
+     * @copydoc Client::get_int_list(const Glib::ustring&) */
+    SListHandle_ValueString get_string_list(const Glib::ustring& key) const;
+    _IGNORE(mateconf_client_get_list, mateconf_client_set_list)
+    
+    /** Get the pair at the given configuration key.
+     * The pair's elements must have the types given in @p types respectively.
+     * If the value is not a pair or the types do not match, an error will be thrown.
+     * @param key the configuration key that contains the pair.
+     * @param types a pair of the expected types of the values.
+     * @return a ValuePair.
+     * @throw Mate::Conf::Error
+     */
+    ValuePair get_pair(const Glib::ustring& key, ValueTypePair types) const;
+    _IGNORE(mateconf_client_get_pair)
+    
+    /** Set the given configuration key to the specified integer value.
+     * @param key the configuration key to set.
+     * @param what the value to set it to.
+     * @throw Mate::Conf::Error
+     */
+    _WRAP_METHOD(void set(const Glib::ustring& key, int what), mateconf_client_set_int, errthrow)
+
+    /** Set the given configuration key to the specified boolean value.
+     * @copydoc Client::set(const Glib::ustring& key, int what) */
+    _WRAP_METHOD(void set(const Glib::ustring& key, bool what), mateconf_client_set_bool, errthrow)
+
+    /** Set the given configuration key to the specified double value.
+     * @copydoc Client::set(const Glib::ustring& key, int what) */
+    _WRAP_METHOD(void set(const Glib::ustring& key,double what), mateconf_client_set_float, errthrow)
+
+    /** Set the given configuration key to the specified string.
+     * @copydoc Client::set(const Glib::ustring& key, int what) */
+    _WRAP_METHOD(void set(const Glib::ustring& key, const Glib::ustring& what), mateconf_client_set_string, errthrow)
+
+    /** Set the given configuration key to the specified Schema.
+     * @copydoc Client::set(const Glib::ustring& key, int what) */
+    _WRAP_METHOD(void set(const Glib::ustring& key, const Schema& what), mateconf_client_set_schema, errthrow)
+
+    /** Set the given configuration key to the specified Value.
+     * @copydoc Client::set(const Glib::ustring& key, int what)
+     */
+    _WRAP_METHOD(void set(const Glib::ustring& key, const Value& what), mateconf_client_set, errthrow)
+    _IGNORE(mateconf_client_set_pair)
+
+    typedef Glib::SListHandle< int, BasicTypeTraits<int> > SListHandleInts;
+    void set_int_list(const Glib::ustring& key, const SListHandleInts& what);
+    
+    typedef Glib::SListHandle< bool, BasicTypeTraits<bool> > SListHandleBools;
+    void set_bool_list(const Glib::ustring& key, const SListHandleBools& what);
+    
+    typedef Glib::SListHandle< double, BasicTypeTraits<double> > SListHandleFloats;
+    void set_float_list(const Glib::ustring& key, const SListHandleFloats& what);
+    
+    void set_schema_list(const Glib::ustring& key, const Glib::SListHandle<Schema>& what);
+    void set_string_list(const Glib::ustring& key, const Glib::SListHandle<Glib::ustring>& what);
+    
+    /** Create a ChangeSet from the current values of the configuration database.
+     * Creates a ChangeSet containing the current values of all the keys listed in
+     * the @p set. For instance, this could be used in a preferences dialog as an undo operation.
+     * @param set A container of the configuration keys to backup.
+     * @return the ChangeSet with the current values.
+     * @throw Mate::Conf::Error
+     * @see ChangeSet
+     */
+    _WRAP_METHOD(ChangeSet change_set_from_current(const Glib::SArray& set), mateconf_client_change_set_from_currentv, errthrow)
+    _IGNORE(mateconf_client_change_set_from_current)
+
+    /** Commit the ChangeSet to the configuration database.
+     * Commits the configuration changes in the ChangeSet to the database.
+     * If @p remove_commited is @c true, all successfully commited keys will be removed from the
+     * ChangeSet. If an error occurs, a Mate::Conf::Error will be thrown. This operation is
+     * not atomic - an error will be thrown on the first error.
+     * @param set the ChangeSet to commit.
+     * @param remove_commited whether to remove successfully-commited keys from the ChangeSet.
+     * @throw Mate::Conf::Error
+     * @see ChangeSet
+     */
+    _WRAP_METHOD(void change_set_commit(ChangeSet& set, bool remove_commited), mateconf_client_commit_change_set, errthrow)
+
+    /** Creates a ChangeSet to reverse the effects of the given ChangeSet.
+     * Creates a ChangeSet that contains the current values of the keys in @p set,
+     * effectively creating a back-up of the values in the database that will be modifed
+     * when the @p set will be commited. For instance, this allows you to create a back-up changeset
+     * to use in case of errors, or an undo facility for preferences.
+     * @param set the ChangeSet to reverse.
+     * @return the reverse ChangeSet.
+     * @throw Mate::Conf::Error
+     * @see ChangeSet
+     */
+    _WRAP_METHOD(ChangeSet change_set_reverse(const ChangeSet& set), mateconf_client_reverse_change_set, errthrow)
+
+#m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
+    /** A signal emitted when a value changes.
+     * This signal will only be called for directories added with add_dir().
+    */
+    _WRAP_SIGNAL(void value_changed(const Glib::ustring& key, const Value& value), "value_changed")
+    _WRAP_METHOD(void value_changed(const Glib::ustring& key, const Value& value), mateconf_client_value_changed)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+    // unreturned_error will never be called, as mateconfmm
+    // catches all GError's and throw()s them as Mate::Conf::Error's.
+    _WRAP_SIGNAL(void unreturned_error(const Glib::Error& error), "unreturned_error")
+    _WRAP_METHOD(void unreturned_error(const Glib::Error& error), mateconf_client_unreturned_error)
+#endif
+
+    /** A signal emitted when an error occurs.
+     * This signal will be emitted when an error occurs, right before the throw() of the error.
+     */
+    _WRAP_SIGNAL(void error(const Glib::Error& error), "error")
+    _WRAP_METHOD(void error(const Glib::Error& error), mateconf_client_error)
+    
+private:
+    void handle_error(GError* pError) const;
+    
+    GSList* get_list(const Glib::ustring& key, MateConfValueType list_type) const;
+};
+
+} /* namespace Conf */
+} /* namespace Mate */

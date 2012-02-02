@@ -1,0 +1,308 @@
+// -*- Mode: C++; c-basic-offset: 4  -*-
+
+/* client.ccg
+ * 
+ * Copyright (C) 2000-2002 MateConfmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/private/object_p.h>
+#include <glib.h>
+#include <mateconf/mateconf-client.h>
+#include "mateconfmm/value.h"
+
+namespace 
+{
+
+
+//gmmproc guesses the mateconf prefix wrongly, so we help it:
+inline static GType g_conf_client_error_handling_mode_get_type()
+{
+  return mateconf_client_error_handling_mode_get_type();
+}
+
+inline static GType g_conf_error_get_type()
+{
+  return mateconf_error_get_type();
+}
+
+inline static GType g_conf_client_preload_type_get_type()
+{
+  return mateconf_client_preload_type_get_type();
+}
+
+
+
+using namespace Mate::Conf;
+
+class PrimitiveHolder 
+{
+public:
+  union
+  {
+    gboolean as_bool;
+    gint as_int;
+    gdouble as_float;
+    char* as_string;
+    MateConfSchema* as_schema;
+  };
+
+  ValueType type;
+
+  PrimitiveHolder(ValueType t)
+  : type(t)
+  {}
+
+  gpointer get_addr()
+  {
+    switch (type)
+    {
+      case VALUE_INT:
+        return &as_int;
+        break;
+      case VALUE_STRING:
+        return &as_string;
+        break;
+      case VALUE_FLOAT:
+        return &as_float;
+        break;
+      case VALUE_BOOL:
+        return &as_bool;
+        break;
+      case VALUE_SCHEMA:
+        return &as_schema;
+        break;
+      default:
+        g_assert_not_reached();
+        return NULL; /* for warnings */
+        break;
+    }
+  }
+
+  MateConfValue* make_value()
+  {
+    MateConfValue* v = mateconf_value_new((MateConfValueType)type);
+
+    switch (type)
+    {
+      case VALUE_INT:
+        mateconf_value_set_int(v,as_int);
+        break;
+      case VALUE_STRING:
+        mateconf_value_set_string(v,as_string);
+        g_free(as_string);
+        break;
+      case VALUE_FLOAT:
+        mateconf_value_set_float(v,as_float);
+        break;
+      case VALUE_BOOL:
+        mateconf_value_set_bool(v,as_bool);
+        break;
+      case VALUE_SCHEMA:
+        mateconf_value_set_schema_nocopy(v,as_schema);
+        break;
+        default:
+        g_assert_not_reached();
+        return NULL; /* for warnings */
+        break;
+    }
+
+    return v;
+  }
+
+};
+
+} //anonymous namespace
+
+namespace Mate
+{
+namespace Conf
+{
+   
+Glib::RefPtr<Client> Client::get_default_client()
+{
+  return Glib::wrap( mateconf_client_get_default() );
+}
+
+Glib::RefPtr<Client> Client::get_client_for_engine(MateConfEngine* engine)
+{
+  return Glib::wrap( mateconf_client_get_for_engine(engine) );
+}
+
+
+guint Client::notify_add(const Glib::ustring& namespace_section, Callback callback)
+{
+  CallbackHolder* pHolder = new CallbackHolder(callback); //destroyed by callback_destroy.
+
+  GError* error = 0;
+  guint iResult = 
+    mateconf_client_notify_add(gobj(),
+          namespace_section.c_str(),
+          &CallbackHolder::call,
+          (gpointer)pHolder, //used by MateConfClient as an arg to callback_call and callback_destroy.
+          &CallbackHolder::destroy,
+          &error);
+  handle_error(error);
+
+  return iResult;
+}
+
+SListHandle_ValueFloat Client::get_float_list(const Glib::ustring& key) const
+{
+    return SListHandle_ValueFloat(get_list(key,MATECONF_VALUE_FLOAT),Glib::OWNERSHIP_DEEP);
+}
+
+SListHandle_ValueInt Client::get_int_list(const Glib::ustring& key) const
+{
+    return SListHandle_ValueInt(get_list(key,MATECONF_VALUE_INT),Glib::OWNERSHIP_DEEP);
+}
+
+SListHandle_ValueBool Client::get_bool_list(const Glib::ustring& key) const
+{
+    return SListHandle_ValueBool(get_list(key,MATECONF_VALUE_BOOL),Glib::OWNERSHIP_DEEP);
+}
+
+SListHandle_ValueSchema Client::get_schema_list(const Glib::ustring& key) const
+{
+    return SListHandle_ValueSchema(get_list(key,MATECONF_VALUE_SCHEMA),Glib::OWNERSHIP_DEEP);
+}
+
+SListHandle_ValueString Client::get_string_list(const Glib::ustring& key) const
+{
+    return SListHandle_ValueString(get_list(key,MATECONF_VALUE_STRING),Glib::OWNERSHIP_DEEP);
+}
+
+void Client::set_int_list(const Glib::ustring& key, const SListHandleInts& what)
+{
+  /* debugging code:
+  std::list<int> testListIntFromGet = what;
+  for(std::list<int>::iterator iter = testListIntFromGet.begin(); iter != testListIntFromGet.end(); ++iter)
+  {
+    int a = *iter;
+    g_warning("set_int_list(): %d", a);
+  }
+  
+  GSList* slist = what.data();
+  GSList* next = slist;
+  while(next)
+  {
+    g_warning("next->data: %d", *((int*)(next->data)));
+    next = next->next;
+  }
+  */
+  
+  GError* error = 0;
+  mateconf_client_set_list(gobj(), key.c_str(), MATECONF_VALUE_INT, what.data(), &error);
+  if(error) ::Glib::Error::throw_exception(error);
+}
+
+void Client::set_bool_list(const Glib::ustring& key, const SListHandleBools& what)
+{
+  GError* error = 0;
+  mateconf_client_set_list(gobj(), key.c_str(), MATECONF_VALUE_BOOL, what.data(), &error);
+  if(error) ::Glib::Error::throw_exception(error);
+}
+
+void Client::set_float_list(const Glib::ustring& key, const SListHandleFloats& what)
+{
+  GError* error = 0;
+  mateconf_client_set_list(gobj(), key.c_str(), MATECONF_VALUE_FLOAT, what.data(), &error);
+  if(error) ::Glib::Error::throw_exception(error);
+}
+
+void Client::set_schema_list(const Glib::ustring& key, const Glib::SListHandle<Schema>& what)
+{
+  GError* error = 0;
+  mateconf_client_set_list(gobj(), key.c_str(), MATECONF_VALUE_SCHEMA, what.data(), &error);
+  if(error) ::Glib::Error::throw_exception(error);
+}
+
+void Client::set_string_list(const Glib::ustring& key, const Glib::SListHandle<Glib::ustring>& what)
+{
+  GError* error = 0;
+  mateconf_client_set_list(gobj(), key.c_str(), MATECONF_VALUE_STRING, what.data(), &error);
+  if(error) ::Glib::Error::throw_exception(error);
+}
+
+GSList* Client::get_list(const Glib::ustring& key, MateConfValueType list_type) const
+{
+  GError* error = 0;
+  GSList* list = mateconf_client_get_list(const_cast<MateConfClient*>(gobj()), key.c_str(), list_type, &error);
+  handle_error(error);
+  for(GSList *i=list;i!=NULL;i=i->next)
+  {
+    MateConfValue* v = mateconf_value_new(list_type);
+    switch(list_type)
+    {
+      case MATECONF_VALUE_INT:
+        mateconf_value_set_int(v, GPOINTER_TO_INT(i->data));
+        break;
+      case MATECONF_VALUE_BOOL:
+        mateconf_value_set_bool(v, (i->data) != 0);
+        break;
+      case MATECONF_VALUE_FLOAT:
+        mateconf_value_set_float(v,*(gdouble*)i->data);
+        g_free(i->data);
+        break;
+      case MATECONF_VALUE_STRING:
+        mateconf_value_set_string(v,(char*)i->data);
+        g_free(i->data);
+        break;
+      case MATECONF_VALUE_SCHEMA:
+        mateconf_value_set_schema_nocopy(v,(MateConfSchema*)i->data);
+        break;
+      default:
+        g_assert_not_reached();
+    }
+
+    i->data=v;
+  }
+
+  return list;
+}
+
+ValuePair Client::get_pair(const Glib::ustring& key, ValueTypePair types) const
+{
+  PrimitiveHolder carp(types.first),cdrp(types.second);
+  GError* error = 0;
+
+  mateconf_client_get_pair(const_cast<MateConfClient*>(gobj()),
+    key.c_str(),
+    (MateConfValueType)types.first, (MateConfValueType)types.second,
+    carp.get_addr(), cdrp.get_addr(),
+    &error);
+  handle_error(error);
+    
+  return ValuePair(Value(carp.make_value()), Value(cdrp.make_value()));
+}
+
+
+void Client::handle_error(GError* error) const
+{
+  if(error)
+    Glib::Error::throw_exception(error);
+}
+
+Entry Client::get_entry(const Glib::ustring& key, bool use_schema_default) const
+{
+  GError *error = 0;
+  Entry retvalue = Entry(mateconf_client_get_entry(const_cast<MateConfClient*>(gobj()), key.c_str(), 0, static_cast<int>(use_schema_default), &(error)));
+  if(error) ::Glib::Error::throw_exception(error);
+  return retvalue;
+}
+
+} /* namespace Conf */
+} /* namespace Mate */

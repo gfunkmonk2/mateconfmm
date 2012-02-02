@@ -1,0 +1,63 @@
+Source: mateconfmm2.6
+Section: libs
+Priority: optional
+Maintainer: Deng Xiyue <manphiz-guest@users.alioth.debian.org>
+Uploaders: @MATE_TEAM@
+DM-Upload-Allowed: yes
+Homepage: http://www.gtkmm.org/
+Vcs-Browser: http://svn.debian.org/viewsvn/pkg-mate/desktop/unstable/mateconfmm2.6
+Vcs-Svn: svn://svn.debian.org/svn/pkg-mate/desktop/unstable/mateconfmm2.6
+Build-Depends: cdbs (>= 0.4.51),
+               chrpath,
+               debhelper (>= 6),
+               dpkg-dev (>= 1.14.16),
+               libmateconf-dev,
+               libglibmm-2.4-dev (>= 2.6.4),
+               libgtkmm-2.4-dev (>= 2.4.0),
+               doxygen
+Standards-Version: 3.8.3
+
+Package: libmateconfmm-2.6-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+         libmateconfmm-2.6-1c2 (= ${binary:Version}),
+         libmateconf-dev,
+         libglibmm-2.4-dev (>=2.6.4),
+         libgtkmm-2.4-dev (>= 2.4.0)
+Suggests: libmateconfmm-2.6-doc
+Description: C++ wrappers for MateConf (development files)
+ MateConf is a system for storing application preferences.  mateconfmm is
+ the C++ wrapper for MateConf.
+ .
+ This package contains development files and examples.
+
+Package: libmateconfmm-2.6-1c2
+Section: libs
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Conflicts: libmateconfmm-2.6-1
+Replaces: libmateconfmm-2.6-1
+Description: C++ wrappers for MateConf (shared library)
+ MateConf is a system for storing application preferences.  mateconfmm is
+ the C++ wrapper for MateConf.
+ .
+ This package contains shared libraries.
+
+Package: libmateconfmm-2.6-doc
+Section: doc
+Architecture: all
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+         doc-base,
+         lynx | www-browser
+Suggests: libgtkmm-2.4-doc
+Conflicts: libmateconfmm-2.6-dev (<< 2.20.0-1)
+Replaces: libmateconfmm-2.6-dev (<< 2.20.0-1)
+Description: C++ wrappers for MateConf (documentation)
+ MateConf is a system for storing application preferences.  mateconfmm is
+ the C++ wrapper for MateConf.
+ .
+ This package contains development reference documentation and examples.

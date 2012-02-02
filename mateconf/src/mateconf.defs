@@ -1,0 +1,3 @@
+(include mateconf_methods.defs)
+(include mateconf_signals.defs)
+(include mateconf_enums.defs)

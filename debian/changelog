@@ -1,0 +1,195 @@
+mateconfmm2.6 (1.1.0) oneiric; urgency=low
+
+  * fork
+
+ -- Matt Rinsch <gfunkmonk@gmail.com>  Wed, 01 Feb 2012 23:00:13 -0500
+
+mateconfmm2.6 (2.28.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * Update Standard-Version to 3.8.3.  No other changes needed.
+
+ -- Deng Xiyue <manphiz-guest@users.alioth.debian.org>  Thu, 17 Dec 2009 16:04:13 -0800
+
+mateconfmm2.6 (2.24.0-2) unstable; urgency=low
+
+  * Upload to unstable.  Drop check-dist.mk.
+  * Use POSIX standard regex classes in sed trick in debian/rules.
+  * `Make -C examples clean` after `make install` to prevent shipping
+    unexpected files.
+  * Use viewsvn in Vcs-Browser.
+
+ -- Deng Xiyue <manphiz-guest@users.alioth.debian.org>  Sun, 05 Oct 2008 02:48:55 +0800
+
+mateconfmm2.6 (2.24.0-1) experimental; urgency=low
+
+  [ Deng Xiyue ]
+  * Add dpkg-dev >= 1.14.16 to Build-Depends for DM usage.
+  * Remove doc-base from Build-Depends as it's not b-deped on.
+  * Add ${shlibs:Depends} to all Depends fields as recommended.
+  * Use machine-interpretable format for debian/copyright.
+  * New upstream release.
+    + Bump shlibs version to 2.24.0 due to new API addition.  ABI remains
+      compatible.
+  * Targeting experimental as Lenny is in freeze.  Add check-dist.mk to
+    debian/rules.
+  * Update Standard-Version to 3.8.0.  No change needed.
+
+  [ Loic Minier ]
+  * Properly anchor package name regexp.
+
+ -- Deng Xiyue <manphiz-guest@users.alioth.debian.org>  Fri, 26 Sep 2008 00:52:20 +0800
+
+mateconfmm2.6 (2.22.0-1) unstable; urgency=low
+
+  * New upstream version.
+    + Bump shlibs version to 2.22.0 as per ChangeLog.
+  * Correct copyright holders, correct license pointer to
+    /usr/share/common-licenses/LGPL-2.1 in debian/copyright.
+  * Bump compat level to 6, let debhelper >= 6 accordingly, and let
+    cdbs >= 0.4.51 to avoid empty -dbg bug.
+  * Refine build-dependencies as per upstream configure script, and drop
+    -1 postfix in version as per lintian.
+  * Add ${shlibs:Depends} to -dev package.
+  * Update watch version to 3.
+  * Refined debian/rules to set variables SHARED_PKG and DOC_PKG by sed
+    from debian/control and use variable SHVER for shlibs version, and
+    refine and reformat corresponding rules accordingly.
+  * Remove compression exclude rule, as it's usually harmless to live
+    without it.
+  * Drop 70_relibtoolize.patch, and use chrpath hack to get rid of amd64
+    rpath issue, hence add chrpath to b-deps.  Should contact upstream for
+    real fix. 
+  * Fix section in doc-base reference.
+  * Ship docs dir to maintain original directory hierarchy, and fix
+    doc-base path.
+  * Add `DM-Upload-Allowed: yes' field.  Thanks Loïc for advocacy.
+
+ -- Deng Xiyue <manphiz-guest@users.alioth.debian.org>  Mon, 17 Mar 2008 11:32:42 +0800
+
+mateconfmm2.6 (2.20.0-3) unstable; urgency=low
+
+  [ Deng Xiyue ]
+  * debian/control, debian/control.in:
+    + Bump standard version to 3.7.3. No change required.
+    + Bump cdbs version to >= 0.4.41, reason given below.
+  * debian/copyright:
+    + Update download URL.
+    + Update upstream authors' email addresses.
+    + Convert encoding from ISO-8859-1 to UTF-8.
+  * debian/*.install:
+    + Refined to the shortened form.
+  * debian/rules:
+    + Add LDFLAGS "-Wl,--as-needed" to reduce unneeded shlibs dependencies.
+    + Let examples be compressed.
+    + Directly specify LDFLAG instead of using DEB_CONFIGURE_SCRIPT_ENV
+      which might override existing LDFLAGS settings, which is supported
+      since cdbs >= 0.4.41, hence bump its dependency. Thanks Loïc Minier.
+    + Include clean-la.mk from mate-pkg-tools to remove dependency_libs
+      information from .la files. Thanks Loïc Minier and Josselin Mouette.
+    - Drop DEB_AUTO_UPDATE_DEBIAN_CONTROL as cdbs dependency is written by
+      hand, and avoiding generating debian/control twice by a single clean.
+    + Replace most ':=' with '+=' to avoid overwriting existing values.
+    + Refine exclude rules.
+    - Remove useless DEB_INSTALL_CHANGELOGS_ALL.
+    + Add DEB_DH_INSTALL_SOURCEDIR := debian/tmp, so *.install files can
+      be shortened.
+  * debian/watch:
+    + Use spaces instead of tabs when indent.
+    (Thanks Loïc Minier for reviewing and the suggestions)
+
+  [ Loic Minier ]
+  * Fix watch file.
+
+ -- Deng Xiyue <manphiz-guest@users.alioth.debian.org>  Mon, 17 Dec 2007 16:56:10 +0800
+
+mateconfmm2.6 (2.20.0-2) unstable; urgency=high
+
+  * debian/control, debian/control.in
+    + Add Homepage, Vcs-Browser and Vcs-Svn entries.
+    + Add Replaces: to handle file moving together with Conflicts:,
+      without which might causes breakage when upgrading. Hence the urgency.
+      (Closes: #452142)
+    + Current Suggests: in -dev to libmateconfmm-2.6-doc.
+
+ -- Deng Xiyue <manphiz-guest@users.alioth.debian.org>  Tue, 04 Dec 2007 00:25:31 +0800
+
+mateconfmm2.6 (2.20.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * Migrate build system to cdbs, and update build dependencies.
+  * Use ${binary:Version} instead of deprecated ${Source-Version}.
+  * Split documents into separate -doc package, and make it conflict with
+    older -dev package.
+  * Provide shlib version to 2.14.2 according to ChangeLog.
+  * debian/patches
+    + 70_relibtoolize.patch as libtool issue work around.
+  * Migrate ownership to Debian MATE Team.
+    - Add myself as maintainer with consensus from Debian MATE Team.
+    - Original maintainer Bradley Bell is also a member of Debian MATE
+      Team now. Thanks Bradley.
+    - Add Debian MATE Team as uploaders.
+
+ -- Deng Xiyue <manphiz-guest@users.alioth.debian.org>  Thu, 25 Oct 2007 21:33:54 +0800
+
+mateconfmm2.6 (2.14.2-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Bradley Bell <btb@debian.org>  Thu,  3 Aug 2006 17:09:36 -0700
+
+mateconfmm2.6 (2.14.1-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Bradley Bell <btb@debian.org>  Sat, 10 Jun 2006 03:42:52 -0700
+
+mateconfmm2.6 (2.10.0-3) unstable; urgency=low
+
+  * use versioned shlibs
+
+ -- Bradley Bell <btb@debian.org>  Tue, 29 Nov 2005 15:03:57 -0800
+
+mateconfmm2.6 (2.10.0-2) unstable; urgency=low
+
+  * Upload new version to unstable (Closes: #292694)
+  * Build against transitioned glibmm
+
+ -- Bradley Bell <btb@debian.org>  Tue, 29 Nov 2005 05:14:48 -0800
+
+mateconfmm2.6 (2.10.0-1) experimental; urgency=low
+
+  * New upstream release
+
+ -- Bradley Bell <btb@debian.org>  Tue, 17 May 2005 16:51:16 -0700
+
+mateconfmm2.6 (2.8.1-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Medium-urgency upload for RC bugfix.
+  * Rebuild for the C++ ABI transition, renaming libmateconfmm2.6-1 to 
+    libmateconfmm2.6-1c2 and conflicting with libmateconfmm2.6-1
+    (closes: #323691).
+  * Build-Depend on libgtkmm-2.4-dev (>= 1:2.6.2-1.1) to ensure we get
+    the lib with a compatible ABI.
+
+ -- Steve Langasek <vorlon@debian.org>  Wed, 17 Aug 2005 14:55:29 -0700
+
+mateconfmm2.6 (2.8.1-1) unstable; urgency=low
+
+  * New upstream release
+  * Cast void* to long instead of int (Closes: #286498)
+
+ -- Bradley Bell <btb@debian.org>  Mon, 31 Jan 2005 19:00:31 -0800
+
+mateconfmm2.6 (2.6.1-2) unstable; urgency=low
+
+  * Fixed watch file
+
+ -- Bradley Bell <btb@debian.org>  Wed, 22 Sep 2004 18:52:19 -0700
+
+mateconfmm2.6 (2.6.1-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Bradley Bell <btb@debian.org>  Tue,  8 Jun 2004 02:20:45 -0700

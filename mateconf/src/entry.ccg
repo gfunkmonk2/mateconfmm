@@ -1,0 +1,53 @@
+// -*- Mode: C++; c-basic-offset: 4  -*-
+/* $Id: entry.ccg,v 1.3 2002/11/26 19:58:13 murrayc Exp $ */
+
+/* entry.ccg
+ *
+ * Copyright (C) 2000-2002 MateConfmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+namespace Mate 
+{
+namespace Conf 
+{
+
+Entry::Entry(const Glib::ustring& key, const Value& val)
+{
+  gobject_ = mateconf_entry_new(key.c_str(), const_cast<MateConfValue*>(val.gobj()));
+}
+
+// There is no mateconf_entry_copy, so we provide one...
+MateConfEntry* Entry::entry_copy(const MateConfEntry* entry)
+{
+  if(entry == 0)
+    return 0;
+
+  MateConfEntry* retval = mateconf_entry_new(mateconf_entry_get_key(entry), mateconf_entry_get_value(entry) );
+
+  mateconf_entry_set_schema_name(retval, mateconf_entry_get_schema_name(entry) );
+  mateconf_entry_set_is_default(retval, mateconf_entry_get_is_default(entry) );
+  mateconf_entry_set_is_writable(retval, mateconf_entry_get_is_writable(entry) );
+  return retval;
+}
+
+Value Entry::get_value() const
+{
+  return Value(mateconf_entry_get_value(gobj()), true);
+}
+  
+} /* namespace Conf */
+} /* namespace Mate */

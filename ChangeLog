@@ -1,0 +1,494 @@
+2.28.0:
+
+2009-03-27  Murray Cumming  <murrayc@murrayc.com>
+
+	* mateconf/src/client.ccg:
+	* mateconf/src/value.ccg: Add some static g_conf_*_get_type() functions that 
+	call mateconf_*_get_type() to fix the build because gmmproc now guesses the 
+	prefix wrong, because we made it guess other prefixes better.
+
+2.26.0:
+
+2009-03-16  Murray Cumming  <murrayc@murrayc.com>
+
+	* configure.in: Increased version number to match MATE 2.26.
+	
+2009-01-24  Deng Xiyue  <manphiz@gmail.com>
+
+	* Change license header to mention Lesser General Public License
+	version 2.1 instead of Library General Public License, to be
+	consistent with COPYING.
+
+2008-12-12  Przemysław Grzegorczyk  <pgrzegorczyk@gmail.com>
+
+	* mateconf/src/client: Cleaned up glib includes to use
+	only toplevel headers.
+	Bug #564214
+
+2.24.0:
+
+2008-09-21  Murray Cumming  <murrayc@murrayc.com>
+
+	* configure.in: Updated version to match mate 2.24.
+
+2.23.1:
+
+2008-08-25  Murray Cumming  <murrayc@murrayc.com>
+
+	* docs/reference/Doxyfile.in: Added newin2p* ALIASES, as in 
+	gtkmm, to mark new API.
+	* mateconf/src/client.hg: recursive_unset(): Added a suitable 
+	default value for the flags parameter.
+	Added notify().
+	Used @newin2p24 in the documentation. 
+
+2008-08-14  Josephine Hsu  <w30372@motorola.com>
+
+	* mateconf/src/mateconf_methods.defs
+	* mateconf/src/value.hg
+	* mateconf/src/client.hg
+	* tools/m4/convert_mateconfmm.m4 :
+	Added UnsetFlags and Client::recursive_unset().
+	Bug #549158.
+
+2008-01-28  Murray Cumming  <murrayc@murrayc.com>
+
+	* mateconf/src/client.hg: Added a string conversion for the signal, 
+	because this is no longer in the .m4 file installed by glibmm.
+
+2.22.0:
+
+2007-12-31  Armin Burgmeier  <armin@openismus.com>
+
+	* configure.in: Detect whether building for Windows (copied from
+	glibmm) and added AC_LIBTOOL_WIN32_DLL to create a shared library.
+
+	* build_shared/Makefile_build.am_fragment: Link with  -no-undefined on
+	Windows, otherwise libtool does not create a DLL because undefined
+	symbols are not allowed in Windows DLLs.
+
+2.20.0:
+
+2007-09-09  Jonathon Jongsma  <jjongsma@mate.org>
+
+	* docs/reference/Doxyfile.in: Add defines to PREDEFINED so that documentation 
+	is built wihout hiding optional API, such as use of exceptions. 
+
+2.18.1:
+
+2007-09-10  Martin Ejdestig  <marejde@gmail.com>
+
+	* mateconf/mateconfmm/setinterface.h: Use 
+	#pragma GCC system_header
+	to supress warnings about the lack of a virtual destructor.
+	We cannot add the virtual destructor (not a big problem in this 
+	case anyway) without breaking ABI, and we do not want to stop 
+	applications from building while -Werror is enabled.
+	Bug #460969
+
+2007-04-24  Yselkowitz <yselkowitz@users.sourceforge.net>
+
+        * scripts/macros.m4: Check for both m4 and M4 in the GNU m4 output,
+        to fix the build on some platforms.
+        Bug #423990
+
+2.18.0:
+
+2007-03-09  Murray Cumming  <murrayc@murrayc.com>
+
+	* Increased version for the MATE 2.18 release.
+
+2.16.0:
+
+2.14.2:
+
+2006-06-13  Jonathon Jongsma  <jonathon.jongsma@gmail.com>
+
+	* examples/client/main.cc: fixed syntax error in the catch block.  Thanks to
+	Elijah Newren (fixes bug #344792)
+
+2.14.1:
+
+2006-06-05  Murray Cumming  <murrayc@murrayc.com>
+
+	* mateconf/mateconfmm/setinterface.cc:
+	* mateconf/mateconfmm/setinterface.h:
+	* mateconf/src/changeset.ccg:
+	* mateconf/src/changeset.hg: Add #ifdefed versions of the API 
+	for when --enable-api-exceptions=no was used with glibmm, 
+	adding the Glib::Error parameter to methods.
+	* examples/client/main.cc:
+	* examples/client/window_test.cc: Added #ifdefed alternative code.
+
+2.14.0:
+
+2006-03-16  Murray Cumming  <murrayc@murrayc.com>
+
+	* NEWS:
+	* configure.in: Increased version for MATE 2.14.
+
+2005-12-06   Jonathon Jongsma <jonathon.jongsma@gmail.com>
+
+	* configure.in: Look for gmmproc in generic libdir 
+	directory, because that is not always lib/. This 
+	fixes the build on some 64-bit systems.
+
+2005-11-28  Murray Cumming  <murrayc@murrayc.com>
+
+	* mateconf/mateconfmm/value_listhelpers.h: Remove extra 
+	template<> to allow compilation on IBM (AIX), Tru64, and 
+	SGI C++ compilers. Bug #321967 with patch by 
+	The Written Word.
+
+2.12.0:
+
+2005-04-28  Stanislav Brabec  <sbrabec@suse.cz>
+
+	* mateconf/src/client.ccg: Use platform dependent GPOINTER_TO_INT for
+	casts.
+
+2005-04-24  Murray Cumming <murrayc@murrayc.com>
+
+	* mateconf/src/client.ccg: Added casts for gcc 4.0 on AMD64, with 
+	comments. Bug #172387 and patch from Bradley Bell.
+
+2.10.0:
+
+2005-03-03  Murray Cumming  <murrayc@murrayc.com>
+
+	* mateconf/src/client.hg: BasicTypeTraits: Allocate a new pointer to the 
+	type. This will be used by float lists.
+	set_float_list, get_float_list: Use doubles, not floats, because 
+	that is what we use elsewhere, and they are theoretically equivalent.
+
+2005-02-15  Murray Cumming  <murrayc@murrayc.com>
+
+	* mateconf/src/client.hg: BasicTypeTraits: Remove extra prefix, to avoid 
+	warning. Do not delete anything in the int and bool specializations.
+
+2005-02-14  Murray Cumming  <murrayc@murrayc.com>
+
+	* mateconf/src/client.hg: Added int and bool template specializations of 
+	BasicTypes<> because mateconf needs us to use GPOINTER_TO_INT and 
+	GINT_TO_POINTER with mateconf_client_set_list() when using 
+	MATECONF_VALUE_INT and MATECONF_VALUE_BOOL. Bug #63585 from Bryan Forbes.
+	We are still not sure what to do for MATECONF_VALUE_FLOAT.
+
+2005-02-03  Murray Cumming  <murrayc@murrayc.com>
+
+	* mateconf/src/client.hg: BasicTypeTraits::release_c_type(): Remove 
+	unnecessary prefix, to fix warning.
+
+2.9.1:
+
+2005-01-10  Murray Cumming  <murrayc@murrayc.com>
+
+	* mateconf/src/client.[hg|ccg]: set_int_list(), set_bool_list(), 
+	set_float_list(): Use a SListHandle_Value with a special Traits, 
+	because the default Traits for basic types seem to be for 
+	ArrayHandles, rather than GLists which store pointers rather than 
+	values. However, this does not work yet - the values in the GList are 
+	nonsense.
+
+2005-01-10  Bryan Forbes  <bryan@reigndropsfall.net>
+
+	* mateconf/src/client.[hg|ccg]: changed SListHandle_Value* to SListHandle<*>
+	for set_*_list() methods.
+	* examples/client/window_test.cc: commented out the int list example because
+	it doesn't compile now.
+
+2005-01-10  Bryan Forbes  <bryan@reigndropsfall.net>
+
+	* mateconf/src/client.[hg|ccg]: renamed set() methods for lists to
+	set_[type]_list().
+	* examples/client/window_test.cc: added two list setting examples in the
+	constructor to show that they don't work.
+
+2.9.1:
+
+2005-01-06  Bryan Forbes  <bryan@reigndropsfall.net>
+
+	* mateconf/src/client.[hg|ccg]: added set() methods for lists.
+
+This is the HEAD branch, for mateconfmm 2.9/2.10.
+
+2.8.1:
+
+2004-11-28  Murray Cumming  <murrayc@murrayc.com>
+
+	* mateconf/src/src/value.hg, client.hg: Removed extra ;s which cause 
+	warnings with g++ 3.4.
+
+2.8.0:
+
+2004-09-12  Murray Cumming  <murrayc@murrayc.com>
+
+	* Increased version for MATE 2.8 release version.
+
+2.6.1:
+
+2004-04-21  Daniel Elstner  <daniel.elstner@gmx.net>
+
+	* tools/m4/convert_mateconfmm.m4: Make _CONVERSION() from MateConfValue*
+	to const Value& take a copy.  This fixes a crash caused by double
+	destruction of the value argument to Client::signal_value_changed().
+	Changing a global conversion for this is kinda fragile, but that's
+	a design problem of gtkmmproc; fortunately no other code is using
+	this particular conversion.
+
+2.6.0:
+
+2004-04-07  Alexander Nedotsukov <bland@FreeBSD.org>
+
+	* Fixed installation directory messed up after 2.0 -> 2.6 change.
+
+2.5.1:
+	
+2004-02-13  Murray Cumming  <murrayc@murrayc.com>
+
+	* Updated for latest libsigc++ 2 API.
+
+2.5.0:
+
+2003-11-05  Murray Cumming  <murrayc@usa.net>
+
+	* configure.in: Fixed typo so that it can find the installed gmmproc
+	and actually build.
+
+2003-11-02  Murray Cumming  <murrayc@usa.net>
+
+	* This is now mateconfmm 2.5, which will become mateconfmm 2.6. It uses 
+	glibmm 2.4 and is parallel-installable.
+
+Branched for HEAD (mateconfmm 2.5/2.6) and mate-2-4.
+
+2003-09-24  Eric Bourque <ericb@computer.org>
+
+ 	* mateconfmm.spec.in - new file
+
+2003-09-04  Bradley Bell  <btb@debian.org>
+
+	* Makefile.am, configure.in, docs: Generate reference docs using
+	doxygen
+
+2.0.1:
+
+2003-01-27  Ole Laursen  <olau@hardworking.dk>
+
+	* mateconf/mateconfmm/callback.cc (call): Instruct the Entry to copy the
+	C object to prevent double destruction. Fixes bug #104181.
+
+2.0.0:
+
+2002-12-10  Andreas Holzmann  <Andreas.Holzmann@epost.de>
+
+ 	* mateconf/src/client.[ccg|hg]: added get_entry() method that uses
+ 	the default locale.
+	
+2002-12-10  Andreas Holzmann  <Andreas.Holzmann@epost.de>
+
+	* mateconf/src/changeset.[ccg|hg]: made some get methods const.
+	* mateconf/src/client.[ccg|hg]: dito.
+	* mateconf/src/schema.hg: dito.
+	
+2002-12-09  Murray Cumming  <murrayc@usa.net>
+
+	* Increased version number to 2.0.0 and renamed library from 1.3
+	to 2.0
+
+2002-11-26  Bassoukos Anastasios  <abas@frodo>
+
+	* mateconf/src/schema.*, mateconf/src/entry.*: removed obsolete
+	constructors.
+
+1.3.10:
+
+2002-11-21  Bassoukos Tassos  <abas@aix.meng.auth.gr>
+
+	* mateconf/src/value.hg, mateconf/src/value.ccg: moved here from
+	mateconf/mateconfmm/value.cc and value.h. Updated to use the new 
+	SListHandle for lists and _WRAP_METHOD. Documented.
+	* mateconf/src/client.hg, mateconf/src/client.ccg: updated to use 
+	_WRAP_METHOD with error throw, Documented.
+	* mateconf/mateconfmm/list_conversion.h: removed file.
+	* mateconf/src/Makefile_list_of_hg.am_fragment: added new files here.
+	* mateconf/mateconfmm/value_listhelpers.h: new file, from list_helpers.h.
+	Modified to use the SListHandle templates. Contains specializations
+	needed for correct interface with MateConfValues.
+	* mateconf/mateconfmm/setinterface.h, mateconf/mateconfmm/setinterface.cc: 
+	new files, common setter interface for Mate::Conf::Client and 
+	Mate::Conf::ChangeSet.
+	* mateconf/src/changeset.hg, mateconf/src/changeset.ccg: new files, 
+	wrappers for MateConfChangeSet.
+	* mateconf/mateconfmm/Makefile.am: removed generated files from sources.
+
+2002-11-20  Bassoukos Tassos  <abas@aix.meng.auth.gr>
+
+ 	* mateconf/src/entry.hg, mateconf/src/entry.ccg: moved here from 
+ 	mateconf/mateconfmm/entry.cc, mateconf/mateconfmm/entry.h, updated to use the 
+ 	m4 code generation macros. TODO: docs.
+ 	* mateconf/src/schema.hg, mateconf/src/schema.ccg: as above for 
+ 	mateconf/mateconfmm/schema.cc and schema.h
+ 	* tools/m4/convert_mateconfmm.m4: added more conversion macros,
+ 	including conversions for enumerations.
+ 	* mateconf/src/Makefile_list_of_hg.am_fragment,
+	
+2002-11-21  Murray Cumming  <murrayc@usa.net>
+
+	* mateconf/mateconfmm/Makefile: Distribute list_conversions.h
+	
+2002-11-19  Bassoukos Tassos  <abas@aix.meng.auth.gr>
+
+	* mateconf/src/mateconf_methods.defs: updated using CVS h2defs.py and
+	current headers; mateconf-listeners.h is not included (backend only).
+	Removed "is-constructor-of" attributes.
+
+2002-11-09  Murray Cumming  <murrayc@usa.net>
+
+	* mateconf/mateconfmm/Makefile.am: The private list_conversion.h header file
+	is no longer installed. Suggested by Tasss Bassoukos
+
+2002-11-09  Murray Cumming  <murrayc@usa.net>
+
+	* mateconf/mateconfmm/list_conversion.h: Used const keyword to make
+	ownership of GSLists more obvious.
+
+2002-11-08  Tasss Bassoukos <abas@aix.meng.auth.gr>
+
+	* mateconf/mateconfmm/list_conversion.h: The list conversion functions
+	from MateConfValue were incorrectly freeing MateConfValues.
+
+2002-11-04  Tasss Bassoukos <abas@aix.meng.auth.gr>
+
+	* mateconf/mateconfmm/value.cc Value::get_list_type() was missing.
+	
+2002-11-05  Murray Cumming  <murrayc@usa.net>
+
+	* mateconf/mateconfmm/value.cc: Value::Value(): don't call mateconf_value_new()
+	with invalid type for default constructor.
+
+2002-09-20  Murray Cumming  <murrayc@usa.net>
+
+	* Hid CallbackHolder from reference documentation.
+
+1.3.9:
+	
+	* Updated for gtkmm2.
+1.3.8:
+	
+2002-08-25  Murray Cummign  <murrayc@usa.net>
+
+	* configure.in: Generated -uninstalled.pc for use with matemm-all.
+
+1.3.7:
+	
+2002-07-19  Murray Cumming  <murrayc@usa.net>
+
+	* mateconf/Makefile.am: Corrected installation of mateconfmm.h header.
+
+1.3.6:
+	
+2002-07-09  Abel Cheung  <maddog@linux.org.hk>
+
+	* tools/m4/Makefile.am: Corrected m4 install destination, was
+	conflicting with libmatemm counterpart.
+	* tools/Makefile.am, tools/m4/Makefile.am: Bundle various Makefile
+	fragments too, automake will fail without them.
+
+1.3.5:
+	
+2002-06-23  Murray Cumming  <murrayc@usa.net>
+
+	* Rebuilt for latest gtkmm.
+
+1.3.4:
+	
+2002-06-16  Murray Cumming  <murrayc@usa.net>
+
+	* examples/client: Changed use of Box::pack_start() to use the new
+	enum parameter.
+	
+2002-05-14  Daniel Elstner  <daniel.elstner@gmx.net>
+
+	* mateconf/mateconfmm/entry.cc, mateconf/mateconfmm/value.cc: Remove default
+	method arguments from the implementation prototype -- gcc-3.1
+	doesn't like them at all.
+
+1.3.3:
+
+2002-05-01  Murray Cumming  <murrayc@usa.net>
+
+	* Client now uses namespace enums.
+
+2002-04-23  Murray Cumming  <murrayc@usa.net>
+
+	* Generated sources are now distributed. build_shared/*.am_fragment 
+	files were copied from libmatecanvasmm.	
+
+2002-04-21  Murray Cumming  <murrayc@usa.net>
+
+	* mateconf/src/client.hg: Changed _CLASS_GERROR to _WRAP_GERROR, for 
+	recent gtkmm change.
+
+1.3.2:
+	
+2002-04-01  Murray Cumming  <murrayc@usa.net>
+
+	* Use new _DEFS() format in .hg files.
+
+1.3.1:
+	
+2002-03-10  Murray Cumming  <murrayc@usa.net>
+
+	* Changed signal args to C++ types.
+
+cd 2002-03-06  Murray Cumming  <murrayc@usa.net>
+
+	* Mate::Conf::Client methods can now throw Mate::Conf::Error 
+	exceptions, using the glibmm Glib::Error system. Therefore the 
+	get_last_error() method has now been removed.
+
+2002-02-24  Murray Cumming  <murrayc@usa.net>
+
+	* Corrected use of $() to @@ in pkg-config .pc.in file.
+	(Rick L Vinyard Jr)
+
+mateconfmm 1.3.0:
+	
+2002-02-17  Murray Cumming  <murrayc@usa.net>
+
+	* Changed namespace from MateConf to Mate::Conf, to make it more clearly
+	a part of matemm. MateConf does not depend on much of MATE, but it is 
+	part of MATE.
+	* Added Mate::Conf::init().
+	* Added the example from the old mateconfmm, and updated it for gtkmm2
+	and mateconfmm2.
+
+2002-01-28  ERDI Gergo  <cactus@cactus.rulez.org>
+
+	* mateconf/src/client.hg: Use std::pair<> for set/get_pair API
+
+001-06-17   Murray Cumming  <murrayc@usa.net>
+        * Used notify_add in example, like in MateConf example,
+          so that two instances of the example will interact.
+
+2001-06-16  Murray Cumming  <murrayc@usa.net>
+        * mateconf--.h is now installed.
+        * typo in mateconf--.cc fixed, so mateconfmm code compiles without
+          the 'undefined symbol' error.
+        * External sample. If I'd done that before then these errors
+          wouldn't have been there.
+
+2001-04-24  Murray Cumming  <murrayc@usa.net>
+
+	* MateConfClient and Value methods that deal with GSList* args are
+          now wrapped with std::list args. There's a lot of very
+          unpleasant and repetitive code in list_conversion.h for this.
+          I have a feeling that this could be simplified with the use
+          of template specialization but I can't get that working.
+
+2001-04-18  Murray Cumming  <murrayc@usa.net>
+
+	* 'make install' now installs headers in include/mateconf-- instead
+          of include.
+        * header guards now prefixed with MATECONFMM instead of GTKEXTRAMM.

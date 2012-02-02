@@ -1,0 +1,188 @@
+# Configure.in -*- m4 -*-
+#
+#  This file tests for various compiler features needed to configure 
+#  the mateconfmm package.  Original skeleton was provided by Stephan Kulow.
+#  All tests were written by Tero Pulkkinen, Mirko Streckenbach, and 
+#  Karl Nelson.
+#
+#  NOTE! IF YOU DO CHANGES HERE, CHECK IF YOU NEED TO MODIFY .m4 TOO!!!
+#
+#  Copyright 2001-2002 Free Software Foundation
+#  Copyright 1999 gtkmm Development Team
+#  Copyright 1998 Stephan Kulow 
+#
+AC_INIT(mateconf/mateconfmmconfig.h.in)
+
+#########################################################################
+#  Version and initialization
+#########################################################################
+MATECONFMM_MAJOR_VERSION=2
+MATECONFMM_MINOR_VERSION=28
+MATECONFMM_MICRO_VERSION=0
+
+#
+# +1 : ? : +1  == new interface that does not break old one
+# +1 : ? : 0   == new interface that breaks old one
+#  ? : ? : 0   == no new interfaces, but breaks apps
+#  ? :+1 : ?   == just some internal changes, nothing breaks but might work 
+#                 better
+# CURRENT : REVISION : AGE
+MATECONFMM_SO_VERSION=1:6:0
+
+MATECONFMM_VERSION=$MATECONFMM_MAJOR_VERSION.$MATECONFMM_MINOR_VERSION.$MATECONFMM_MICRO_VERSION
+MATECONFMM_RELEASE=$MATECONFMM_MAJOR_VERSION.$MATECONFMM_MINOR_VERSION
+AC_DEFINE_UNQUOTED(MATECONFMM_MAJOR_VERSION, $MATECONFMM_MAJOR_VERSION)
+AC_DEFINE_UNQUOTED(MATECONFMM_MINOR_VERSION, $MATECONFMM_MINOR_VERSION)
+AC_DEFINE_UNQUOTED(MATECONFMM_MICRO_VERSION, $MATECONFMM_MICRO_VERSION)
+AC_SUBST(MATECONFMM_VERSION)
+AC_SUBST(MATECONFMM_RELEASE)
+AC_SUBST(MATECONFMM_SO_VERSION)
+
+AC_CONFIG_AUX_DIR(scripts)
+
+dnl For automake.
+VERSION=$MATECONFMM_VERSION
+PACKAGE=mateconfmm
+
+dnl Initialize automake stuff
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+
+dnl Specify a configuration file (no autoheader)
+AM_CONFIG_HEADER(mateconf/mateconfmmconfig.h)
+AM_MAINTAINER_MODE
+AL_ACLOCAL_INCLUDE(scripts)
+
+
+#########################################################################
+#  Configure arguments 
+#########################################################################
+
+#########################################################################
+#  Environment Checks
+#########################################################################
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_MAKE_SET
+AC_CANONICAL_HOST
+
+dnl Used for enabling the "-no-undefined" flag while generating DLLs
+dnl Copied from the official gtk+-2 configure.in
+AC_MSG_CHECKING([for some Win32 platform])
+case "$host" in
+  *-*-mingw*|*-*-cygwin*)
+    platform_win32=yes
+    ;;
+  *)
+    platform_win32=no
+    ;;
+esac
+AC_MSG_RESULT([$platform_win32])
+AM_CONDITIONAL(PLATFORM_WIN32, test "$platform_win32" = "yes")
+
+AC_MSG_CHECKING([for native Win32])
+case "$host" in
+  *-*-mingw*)
+    os_win32=yes
+    ;;
+  *)
+    os_win32=no
+    ;;
+esac
+AC_MSG_RESULT([$os_win32])
+AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
+
+AM_DISABLE_STATIC
+AC_LIBTOOL_WIN32_DLL
+AM_PROG_LIBTOOL
+
+AL_PROG_GNU_M4(AC_MSG_ERROR([dnl
+SUN m4 does not work for building gtkmm. 
+Please install GNU m4.]))
+
+AL_PROG_GNU_MAKE(AC_MSG_ERROR([dnl
+SUN make does not work for building gtkmm.
+Please install GNU make.]))
+
+
+#########################################################################
+#  Dependancy checks
+#########################################################################
+
+# Make these available to both PKG_CHECK_MODULES and the .pc.in file:
+GLIBMM_VERSION_NEEDED=2.6.4
+AC_SUBST(GLIBMM_VERSION_NEEDED)
+GTKMM_VERSION_NEEDED=2.4.0
+AC_SUBST(GTKMM_VERSION_NEEDED)
+MATECONF_VERSION_NEEDED=1.1.0
+AC_SUBST(MATECONF_VERSION_NEEDED)
+
+PKG_CHECK_MODULES(MATECONFMM, glibmm-2.4 >= $GLIBMM_VERSION_NEEDED mateconf-2.0 >= $MATECONF_VERSION_NEEDED)
+AC_SUBST(MATECONFMM_CFLAGS)
+AC_SUBST(MATECONFMM_LIBS)
+
+PKG_CHECK_MODULES(MATECONFMM_EXAMPLES, gtkmm-2.4 >= $GTKMM_VERSION_NEEDED mateconf-2.0 >= $MATECONF_VERSION_NEEDED)
+AC_SUBST(MATECONFMM_EXAMPLES_CFLAGS)
+AC_SUBST(MATECONFMM_EXAMPLES_LIBS)
+
+GLIBMM_LIBDIR=`pkg-config --variable=libdir glibmm-2.4`
+GMM_PROCDIR=$GLIBMM_LIBDIR/glibmm-2.4/proc
+AC_SUBST(GMM_PROCDIR)
+GMM_PROC=$GMM_PROCDIR/gmmproc
+AC_SUBST(GMM_PROC)
+
+#########################################################################
+#  C++ checks
+#########################################################################
+AC_PROG_CXX
+AC_LANG_CPLUSPLUS
+
+
+# Create a list of input directories for Doxygen.  We have to check wether
+# we are building in the source directory, because Doxygen doesn't like
+# duplicated directories in the input list.
+MATECONFMM_DOXYGEN_INPUT=''
+gtkmm_srcdir=`cd "$srcdir" && pwd`
+gtkmm_builddir=`pwd`
+for sublib in mateconf
+do
+  MATECONFMM_DOXYGEN_INPUT="$MATECONFMM_DOXYGEN_INPUT $gtkmm_builddir/$sublib/$sublib""mm/"
+  test "x$gtkmm_builddir" = "x$gtkmm_srcdir" || \
+    MATECONFMM_DOXYGEN_INPUT="$MATECONFMM_DOXYGEN_INPUT $gtkmm_srcdir/$sublib/$sublib""mm/"
+done
+AC_SUBST(MATECONFMM_DOXYGEN_INPUT)
+
+
+
+# Dummy conditional just to make automake-1.4 happy.
+# We need an always-false condition in docs/Makefile.am.
+AM_CONDITIONAL(MATECONFMM_FALSE,[false])
+
+# HACK:  Assign a dummy in order to prevent execution of autoheader by the
+# maintainer-mode rules.  That would fail since we aren't using autoheader.
+AUTOHEADER=':'
+
+
+AC_OUTPUT([
+  Makefile
+
+  mateconf/Makefile
+  mateconf/mateconfmm-2.6.pc
+  mateconf/mateconfmm-2.6-uninstalled.pc
+  mateconf/src/Makefile
+  mateconf/mateconfmm/Makefile
+  mateconf/mateconfmm/private/Makefile
+        mateconfmm.spec
+
+  tools/Makefile
+  tools/m4/Makefile
+  tools/extra_defs_gen/Makefile
+
+  scripts/Makefile
+
+  examples/Makefile
+    examples/client/Makefile
+
+    docs/Makefile
+    docs/reference/Makefile
+    docs/reference/Doxyfile
+])

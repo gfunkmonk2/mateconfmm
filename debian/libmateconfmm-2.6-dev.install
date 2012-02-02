@@ -1,0 +1,6 @@
+usr/include
+usr/lib/mateconfmm-2.6
+usr/lib/lib*.a
+usr/lib/lib*.so
+usr/lib/pkgconfig
+usr/lib/*.la

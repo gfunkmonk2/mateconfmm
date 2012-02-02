@@ -1,0 +1,70 @@
+// -*- Mode: C++; c-basic-offset: 4  -*-
+/* $Id: schema.hg,v 1.5 2002/12/10 23:26:01 murrayc Exp $ */
+
+/* schema.hg
+ * 
+ * Copyright (C) 2000-2002 MateConfmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <mateconfmm/value.h>
+
+_DEFS(mateconfmm,mateconf)
+
+extern "C" {
+    // TODO: do not include this.
+#include <mateconf/mateconf-schema.h>
+}
+
+namespace Mate
+{
+
+namespace Conf
+{
+
+class Value;
+
+class Schema 
+{
+  _CLASS_OPAQUE_COPYABLE(Schema,MateConfSchema, mateconf_schema_new,mateconf_schema_copy,mateconf_schema_free)
+  _IGNORE(mateconf_schema_new,mateconf_schema_copy,mateconf_schema_free)
+public:
+  _WRAP_METHOD(void set_type(ValueType type), mateconf_schema_set_type)
+  _WRAP_METHOD(void set_list_type(ValueType type), mateconf_schema_set_list_type)
+  _WRAP_METHOD(void set_car_type(ValueType type), mateconf_schema_set_car_type)
+  _WRAP_METHOD(void set_cdr_type(ValueType type), mateconf_schema_set_cdr_type)
+  _WRAP_METHOD(void set_locale(const std::string& locale), mateconf_schema_set_locale)
+  _WRAP_METHOD(void set_short_desc(const Glib::ustring& desc), mateconf_schema_set_short_desc)
+  _WRAP_METHOD(void set_long_desc(const Glib::ustring& desc), mateconf_schema_set_long_desc)
+  _WRAP_METHOD(void set_owner(const Glib::ustring& owner), mateconf_schema_set_owner)
+  _WRAP_METHOD(void set_default_value(const Value& value), mateconf_schema_set_default_value)
+  _IGNORE(mateconf_schema_set_default_value_nocopy)
+
+  _WRAP_METHOD(ValueType get_type() const, mateconf_schema_get_type)
+  _WRAP_METHOD(ValueType get_list_type() const, mateconf_schema_get_list_type)
+  _WRAP_METHOD(ValueType get_car_type() const, mateconf_schema_get_car_type)
+  _WRAP_METHOD(ValueType get_cdr_type() const, mateconf_schema_get_cdr_type)
+  _WRAP_METHOD(std::string get_locale() const, mateconf_schema_get_locale)
+  _WRAP_METHOD(Glib::ustring get_short_desc() const, mateconf_schema_get_short_desc)
+  _WRAP_METHOD(Glib::ustring get_long_desc() const, mateconf_schema_get_long_desc)
+  _WRAP_METHOD(Glib::ustring get_owner() const, mateconf_schema_get_owner)
+  _WRAP_METHOD(Value get_default_value() const, mateconf_schema_get_default_value)
+    
+};
+
+
+} /* namespace Conf */
+} /* namespace Mate */

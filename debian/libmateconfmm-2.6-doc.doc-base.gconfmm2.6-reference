@@ -1,0 +1,9 @@
+Document: mateconfmm2.6-reference
+Title: mateconfmm 2.6 Reference Manual
+Author: Doxygen
+Abstract: Reference Manual for mateconfmm 2.6 (C++ bindings for MateConf)
+Section: Programming/C++
+
+Format: HTML
+Index: /usr/share/doc/libmateconfmm-2.6-doc/docs/reference/html/index.html
+Files: /usr/share/doc/libmateconfmm-2.6-doc/docs/reference/html/*.html

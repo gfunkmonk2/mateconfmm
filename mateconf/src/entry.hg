@@ -1,0 +1,112 @@
+// -*- Mode: C++; c-basic-offset: 4  -*-
+/* $Id: entry.hg,v 1.4 2002/12/10 23:26:01 murrayc Exp $ */
+
+/* entry.hg
+ * 
+ * Copyright (C) 2000-2002 MateConfmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <mateconfmm/value.h>
+#include <mateconfmm/schema.h>
+
+_DEFS(mateconfmm,mateconf)
+
+extern "C" {
+  typedef struct _MateConfEntry MateConfEntry;
+}
+
+namespace Mate
+{
+
+namespace Conf
+{
+
+/** An Entry stores an entry from a MateConf "directory", including a 
+ * key-value pair, the name of the Schema applicable to this entry, 
+ * whether the value is a default value, and whether MateConf can write 
+ * a new value at this key. The key should be an absolute key, not a relative key.
+ */
+class Entry
+{
+  _CLASS_OPAQUE_COPYABLE(Entry,MateConfEntry,NONE,entry_copy,mateconf_entry_free)
+  _IGNORE(mateconf_entry_free, mateconf_entry_new, mateconf_entry_new_nocopy)
+  _IGNORE(mateconf_entry_equal, mateconf_entry_set_value_nocopy)
+  _IGNORE(mateconf_entry_steal_value)
+
+public:
+  /** Construct an Entry with the given @p key and @p value */
+  Entry(const Glib::ustring& key, const Value& value);
+
+  /** Set the Value of the entry. */
+  _WRAP_METHOD(void set_value(const Value& val), mateconf_entry_set_value)
+
+  /** Set the Schema name of the entry. */
+  _WRAP_METHOD(void set_schema_name(const Glib::ustring& val), mateconf_entry_set_schema_name)
+
+  /** Set whether the value has orginated from the default given in the Schema */
+  _WRAP_METHOD(void set_is_default(bool is_default = true), mateconf_entry_set_is_default)
+
+  /** Set whether the given configuration key iw writeable. */
+  _WRAP_METHOD(void set_is_writable(bool is_writable = true), mateconf_entry_set_is_writable)
+
+  /** Retrieve the value of the entry.
+   * @return a copy the entry's value. */
+  Value get_value() const;
+  _IGNORE(mateconf_entry_get_value)
+
+  /** Retrieve the Schema name associated with the given entry */
+  _WRAP_METHOD(Glib::ustring get_schema_name() const, mateconf_entry_get_schema_name)
+
+  /* Retrieve the configuration key this entry points to */
+  _WRAP_METHOD(Glib::ustring get_key() const, mateconf_entry_get_key)
+
+  /* Retrieve wether this Entry contains the default value, as defined in the Schema. */
+  _WRAP_METHOD(bool get_is_default() const, mateconf_entry_get_is_default)
+
+  /* Get the writeable status of the configuration key of this entry. */
+  _WRAP_METHOD(bool get_is_writable() const, mateconf_entry_get_is_writable)
+
+private:
+  static MateConfEntry* entry_copy(const MateConfEntry*);
+};
+
+} /* namespace Conf */
+} /* namespace Mate */
+
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+namespace Glib
+{
+namespace Container_Helpers
+{
+
+template<>
+struct TypeTraits<Mate::Conf::Entry> 
+{
+    typedef Mate::Conf::Entry CppType;
+    typedef const MateConfEntry* CType;
+    typedef MateConfEntry* CTypeNonConst;
+    
+    static CType   to_c_type      (const CppType& item) { return item.gobj(); }
+    static CType   to_c_type      (const CType&   item) { return item; }
+    static CppType to_cpp_type    (const CType&   item) { return Mate::Conf::Entry(const_cast<CTypeNonConst>(item)); }
+    static void    release_c_type (const CType&)        {}
+};
+
+} // Namespace Container_Helpers
+} // namespace Glib
+#endif // DOXYGEN_SHOULD_SKIP_THIS
